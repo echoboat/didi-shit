@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 滴滴拉屎</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #fff;
+    color: #555;
+  }
+
+  /* ===== 顶部标题栏 ===== */
+  #header {
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: 2px;
+  }
+
+  /* ===== 主体三栏 ===== */
+  #main {
+    display: flex;
+    height: calc(100vh - 140px);
+    width: 100%;
+  }
+
+  /* 左侧空白区（含搜索框 + 引导 + 统计 + 标语） */
+  #leftBlank {
+    width: 320px;
+    background: #f9f9f9;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 18px;
+    overflow-y: auto;
+  }
+
+  /* 搜索框 */
+  .search-box {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 14px;
+    background: #fff;
+    color: #555;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: #888; }
+  .search-btn {
+    width: 60px;
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .search-btn:hover { background: #f5f5f5; border-color: #999; }
+
+  /* 引导卡片 */
+  .guide-card {
+    width: 100%;
+    border: 1px dashed #ccc;
+    border-radius: 10px;
+    padding: 14px 14px;
+    background: #fff;
+    font-style: italic;
+    color: #999;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* 今日数据统计 */
+  .stats-block { width: 100%; }
+  .stat-card {
+    margin-bottom: 12px;
+    padding: 6px 4px;
+    border-bottom: 1px solid #eee;
+  }
+  .stat-card:last-child { border-bottom: none; margin-bottom: 0; }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.2;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: #999;
+    margin-top: 2px;
+  }
+
+  /* 趣味标语（三条同时显示） */
+  .slogan-block {
+    width: 100%;
+    font-size: 14px;
+    color: #999;
+    font-style: italic;
+    line-height: 1.8;
+    padding: 8px 4px;
+  }
+  .slogan-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .slogan-refresh {
+    cursor: pointer;
+    user-select: none;
+    font-size: 15px;
+    transition: transform 0.3s, color 0.15s;
+  }
+  .slogan-refresh:hover { color: #777; }
+  .slogan-refresh:active { transform: rotate(180deg); }
+  .slogan-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .slogan-text { flex: 1; word-break: break-all; }
+
+  /* ===== 详情页评论区 ===== */
+  .modal-comments {
+    flex-shrink: 0;
+    height: 240px;
+    border-top: 1px dashed #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .comments-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    padding: 10px 20px 6px;
+    flex-shrink: 0;
+  }
+  .comments-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 8px;
+    min-height: 0;
+  }
+  .comment-item {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    font-size: 13px;
+  }
+  .comment-item:last-child { border-bottom: none; }
+  .comment-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .comment-nick { font-weight: 700; color: #333; }
+  .comment-time { font-size: 11px; color: #aaa; }
+  .comment-text { color: #555; line-height: 1.5; margin-bottom: 4px; }
+  .comment-images { display: flex; gap: 6px; flex-wrap: wrap; }
+  .comment-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .comments-empty {
+    color: #bbb;
+    font-size: 12px;
+    text-align: center;
+    padding: 16px 0;
+    font-style: italic;
+  }
+  .comment-form {
+    flex-shrink: 0;
+    padding: 8px 20px 12px;
+    border-top: 1px solid #eee;
+    background: #fafafa;
+  }
+  .comment-textarea {
+    width: 100%;
+    height: 44px;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #555;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .comment-textarea:focus { border-color: #888; }
+  .comment-form-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .comment-btn {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .comment-btn:hover { background: #f5f5f5; border-color: #999; }
+  .comment-submit { margin-left: auto; }
+  .comment-preview-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .preview-wrap {
+    position: relative;
+    width: 50px;
+    height: 50px;
+  }
+  .preview-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .preview-del {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 14px;
+    text-align: center;
+    cursor: pointer;
+    color: #999;
+  }
+  .preview-del:hover { background: #f5f5f5; color: #555; }
+  .comment-count { font-size: 11px; color: #aaa; margin-left: 4px; }
+
+  /* 中间地图容器 */
+  #mapContainer {
+    flex: 1;
+    position: relative;
+    min-width: 0;
+  }
+  #map { width: 100%; height: 100%; }
+
+  /* ===== 右侧侧边栏 ===== */
+  #sidebar {
+    width: 320px;
+    background: #fff;
+    border-left: 1px solid #eee;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .rank-section {
+    flex: 1;
+    padding: 18px 18px 14px;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .rank-section + .rank-section {
+    border-top: 1px dashed #ddd;
+  }
+  .rank-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  .rank-title.shit { color: #c0392b; }
+  .rank-title.water { color: #2980b9; }
+  .rank-item {
+    padding: 10px 4px;
+    border-bottom: 1px dashed #eee;
+    font-size: 14px;
+    font-weight: 400;
+    color: #555;
+    line-height: 1.5;
+  }
+  .rank-item:last-child { border-bottom: none; }
+  .empty-state {
+    color: #bbb;
+    font-size: 13px;
+    text-align: center;
+    padding: 28px 0;
+    font-style: italic;
+  }
+
+  /* ===== 底部固定评分栏 ===== */
+  #footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #555;
+    z-index: 100;
+    padding: 0 20px;
+    flex-wrap: wrap;
+  }
+  .rate-btn {
+    background: #fff;
+    border: 1px solid #bbb;
+    color: #555;
+    padding: 6px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .rate-btn:hover { background: #f4f4f4; border-color: #888; }
+  .rate-btn:disabled {
+    background: #f0f0f0;
+    border-color: #ddd;
+    color: #bbb;
+    cursor: not-allowed;
+  }
+  .rate-btn:disabled:hover { background: #f0f0f0; border-color: #ddd; }
+  .site-rated-tip {
+    color: #888;
+    font-size: 13px;
+  }
+  #siteRateDisplay { color: #888; }
+
+  /* ===== 详情评分模态框 ===== */
+  #modalMask {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  #modalMask.show { display: flex; }
+  #modal {
+    width: 85vw;
+    height: 85vh;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 14px 22px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 18px; font-weight: 600; color: #222; }
+  .modal-close {
+    cursor: pointer;
+    font-size: 20px;
+    color: #888;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    line-height: 1;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .modal-close:hover { background: #f0f0f0; color: #444; }
+  .modal-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* 蹲坑 SVG 区 */
+  .toilet-svg-wrap {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55vh;
+    overflow: auto;
+    background: #fcfcfc;
+  }
+  .toilet-stage {
+    position: relative;
+    width: 380px;
+    height: 500px;
+    flex-shrink: 0;
+  }
+  .toilet-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+  }
+
+  /* 图标网格（绝对定位于蹲坑便池内部） */
+  .icon-grid {
+    position: absolute;
+    left: 62.5px;
+    top: 180.5px;
+    width: 255px;   /* 6 * 40 + 5 * 3 */
+    height: 169px;  /* 4 * 40 + 3 * 3 */
+    display: grid;
+    grid-template-columns: repeat(6, 40px);
+    grid-template-rows: repeat(4, 40px);
+    gap: 3px;
+    pointer-events: none;
+  }
+  .icon-cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    line-height: 1;
+  }
+  /* 初始空状态占位文字 */
+  .grid-placeholder {
+    position: absolute;
+    left: 62.5px;
+    top: 180.5px;
+    width: 255px;
+    height: 169px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 15px;
+    font-style: italic;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  /* 控制面板 */
+  .modal-controls {
+    width: 250px;
+    border-left: 1px solid #eee;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  .score-display {
+    font-size: 14px;
+    font-weight: 400;
+    color: #555;
+    line-height: 2;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 14px;
+    background: #fafafa;
+  }
+  .score-display b { color: #222; font-weight: 600; }
+  .score-btn {
+    background: #fff;
+    border: 1px solid #bbb;
+    color: #555;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 6px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .score-btn:hover { background: #f4f4f4; border-color: #888; }
+  .hint {
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.7;
+    border-top: 1px dashed #eee;
+    padding-top: 12px;
+  }
+
+  /* 自定义公厕标记：蓝色倒三角形（兴趣点风格） */
+  .toilet-marker {
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 16px solid #2980b9;
+    cursor: pointer;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+  }
+
+  /* ===== 自定义地图悬停提示框（白色简约线条风） ===== */
+  .tip-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 10px 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 18px;
+    color: #333333;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1.4;
+    position: relative;
+    animation: tipFadeIn 0.18s ease;
+  }
+  /* 底部指示小三角，指向标记 */
+  .tip-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #fff;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08));
+  }
+  /* 淡入动画 */
+  @keyframes tipFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* 覆盖高德 InfoWindow 默认外壳，让自定义卡片完全接管样式 */
+  .amap-info-content,
+  .amap-info-outer { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+  .amap-info-sharp { display: none !important; }
+  .amap-info-close { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- 顶部标题栏 -->
+<div id="header">🚀 滴滴拉屎</div>
+
+<!-- 主体三栏 -->
+<div id="main">
+  <div id="leftBlank">
+    <!-- 功能1：搜索框 -->
+    <div class="search-box">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索厕所名称…" />
+      <button class="search-btn" onclick="searchToilet()">🔍 搜索</button>
+    </div>
+
+    <!-- 引导文字（保留） -->
+    <div class="guide-card">🚽 没找到想要的厕所？<br>单击地图创建你的厕所！</div>
+
+    <!-- 功能2：今日数据统计 -->
+    <div class="stats-block">
+      <div class="stat-card">
+        <div class="stat-num">🚽 <span id="statTotal">0</span> 座</div>
+        <div class="stat-label">总公厕数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">✏️ <span id="statRated">0</span> 座</div>
+        <div class="stat-label">已评分数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">💩 <span id="statTopShit">--</span></div>
+        <div class="stat-label">最高粪便率</div>
+      </div>
+    </div>
+
+    <!-- 功能3：趣味标语（三条同时显示 + 刷新按钮） -->
+    <div class="slogan-block" id="sloganBlock">
+      <div class="slogan-head">
+        <span>💬 趣味标语</span>
+        <span class="slogan-refresh" id="sloganRefresh" title="换三条">🔄</span>
+      </div>
+      <div class="slogan-line"><span>①</span><span class="slogan-text" id="sloganText0">加载中...</span></div>
+      <div class="slogan-line"><span>②</span><span class="slogan-text" id="sloganText1">加载中...</span></div>
+      <div class="slogan-line"><span>③</span><span class="slogan-text" id="sloganText2">加载中...</span></div>
+    </div>
+  </div>
+  <div id="mapContainer">
+    <div id="map"></div>
+  </div>
+  <div id="sidebar">
+    <div class="rank-section">
+      <div class="rank-title shit">💩 一塌糊涂</div>
+      <div id="rankShit"></div>
+    </div>
+    <div class="rank-section">
+      <div class="rank-title water">💧 一尘不染</div>
+      <div id="rankWater"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部固定评分栏 -->
+<div id="footer">
+  <span>📊 本站评分是否客观：</span>
+  <button class="rate-btn" id="rateYesBtn" onclick="rateSite('yes')">是</button>
+  <button class="rate-btn" id="rateNoBtn" onclick="rateSite('no')">否</button>
+  <span id="siteRateDisplay"></span>
+  <span id="siteRatedTip" class="site-rated-tip" style="display:none;">✅ 您已参与过评分，感谢您的反馈！</span>
+</div>
+
+<!-- 详情评分模态框 -->
+<div id="modalMask">
+  <div id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">公厕详情</div>
+      <div class="modal-close" onclick="closeModal()" title="关闭">×</div>
+    </div>
+    <div class="modal-body">
+      <!-- 蹲坑图形 + 图标池 -->
+      <div class="toilet-svg-wrap">
+        <div class="toilet-stage">
+          <!-- 俯视蹲便器：写实风格，细线条 + 轻微阴影 -->
+          <svg class="toilet-svg" viewBox="0 0 380 500" preserveAspectRatio="xMidYMid meet">
+            <!-- 陶瓷主体 -->
+            <rect x="30" y="15" width="320" height="470" rx="30" ry="30"
+                  fill="#fafafa" stroke="#666" stroke-width="2"/>
+            <!-- 便池内凹（外圈） -->
+            <ellipse cx="190" cy="265" rx="135" ry="175"
+                     fill="#fff" stroke="#bbb" stroke-width="2"/>
+            <!-- 便池内凹（内圈，营造深度） -->
+            <ellipse cx="190" cy="265" rx="123" ry="163"
+                     fill="none" stroke="#e5e5e5" stroke-width="1.5"/>
+            <!-- 后方冲水孔 -->
+            <ellipse cx="190" cy="108" rx="18" ry="10"
+                     fill="#e8e8e8" stroke="#999" stroke-width="1.5"/>
+            <line x1="190" y1="98" x2="190" y2="118" stroke="#ccc" stroke-width="1"/>
+            <!-- 左侧防滑脚踏板 -->
+            <rect x="45" y="215" width="42" height="110" rx="18" ry="18"
+                  fill="#f0f0f0" stroke="#999" stroke-width="1.5"/>
+            <line x1="52" y1="235" x2="80" y2="262" stroke="#ccc" stroke-width="2"/>
+            <line x1="52" y1="255" x2="80" y2="282" stroke="#ccc" stroke-width="2"/>
+            <line x1="52" y1="275" x2="80" y2="302" stroke="#ccc" stroke-width="2"/>
+            <!-- 右侧防滑脚踏板 -->
+            <rect x="293" y="215" width="42" height="110" rx="18" ry="18"
+                  fill="#f0f0f0" stroke="#999" stroke-width="1.5"/>
+            <line x1="300" y1="235" x2="328" y2="262" stroke="#ccc" stroke-width="2"/>
+            <line x1="300" y1="255" x2="328" y2="282" stroke="#ccc" stroke-width="2"/>
+            <line x1="300" y1="275" x2="328" y2="302" stroke="#ccc" stroke-width="2"/>
+            <!-- 前沿弧线 -->
+            <path d="M 75 360 Q 190 430 305 360" fill="none" stroke="#bbb" stroke-width="1.5"/>
+          </svg>
+          <!-- 24 格图标池（4×6） -->
+          <div class="icon-grid" id="iconGrid"></div>
+          <!-- 空状态占位文字 -->
+          <div class="grid-placeholder" id="gridPlaceholder">暂无评价</div>
+        </div>
+      </div>
+      <!-- 控制面板 -->
+      <div class="modal-controls">
+        <div class="score-display">
+          名称：<b id="ctrlName"></b><br>
+          💩 粪便：<b id="ctrlShit">0</b><br>
+          💧 清水：<b id="ctrlWater">0</b><br>
+          容量：<b id="ctrlTotal">0</b> / 24
+        </div>
+        <button class="score-btn" onclick="addShit()">💩 提升粪便率</button>
+        <button class="score-btn" onclick="addWater()">💧 提升干净率</button>
+        <div class="hint">
+          规则：未满时新增；已满时新类型替换对方类型；满且全为同类型时无反应。
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 详情页评论区（蹲坑图形与打分按钮下方） ===== -->
+    <div class="modal-comments">
+      <div class="comments-title">💬 大家的评价 <span class="comment-count" id="commentCount"></span></div>
+      <div class="comments-list" id="commentsList"></div>
+      <div class="comment-form">
+        <textarea class="comment-textarea" id="commentText" maxlength="200" placeholder="写点你的感受吧...（最多200字）"></textarea>
+        <div class="comment-preview-row" id="commentPreviewRow"></div>
+        <div class="comment-form-row">
+          <button class="comment-btn" onclick="pickImages()">📷 添加图片</button>
+          <input type="file" id="commentFile" accept="image/jpeg,image/png,image/gif" multiple style="display:none" onchange="onFilesSelected(this)" />
+          <button class="comment-btn comment-submit" onclick="submitComment()">发布评价</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 高德地图 Key 替换位置 ============ -->
+<!-- 高德地图 Web端 JS API Key 与安全密钥（securityJsCode 用于 2.0 版本安全校验） -->
+<!-- 请将下方 key 与 securityJsCode 替换为你自己的高德地图凭证 -->
+<!-- 申请地址：https://console.amap.com/dev/key/app -->
+<script type="text/javascript">
+  window._AMapSecurityConfig = {
+    securityJsCode: '5281d17732af901918fb4c8798e53954'
+  };
+</script>
+<script src="https://webapi.amap.com/maps?v=2.0&key=dc65d0d247741a82c6ac0c2a06bc6345"></script>
+<script>
+  /* ============ 常量与数据 ============ */
+  var GUANGZHOU_CENTER = [113.26, 23.13];
+  var STORAGE_KEY = 'didi_lashi_toilets';
+  var SITE_RATING_KEY = 'site_rating';
+  var CAP = 24;
+
+  var map = null;
+  var markers = [];
+  var toilets = [];
+  var currentToiletId = null;
+  var hoverInfo = null; // 悬停提示用的 InfoWindow 实例
+
+  // 10 个广州公厕示例
+  var SAMPLE_TOILETS = [
+    { name: '体育中心公厕', lng: 113.3210, lat: 23.1360 },
+    { name: '天河公园公厕', lng: 113.3620, lat: 23.1310 },
+    { name: '越秀公园公厕', lng: 113.2660, lat: 23.1420 },
+    { name: '白云山公厕',   lng: 113.2980, lat: 23.1850 },
+    { name: '北京路公厕',   lng: 113.2640, lat: 23.1290 },
+    { name: '上下九公厕',   lng: 113.2450, lat: 23.1210 },
+    { name: '海珠广场公厕', lng: 113.2620, lat: 23.1110 },
+    { name: '珠江公园公厕', lng: 113.3320, lat: 23.1290 },
+    { name: '花城广场公厕', lng: 113.3230, lat: 23.1190 },
+    { name: '荔湾湖公厕',   lng: 113.2330, lat: 23.1430 }
+  ];
+
+  function genId() {
+    return 't_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+  }
+
+  function loadToilets() {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) { toilets = parsed; return; }
+      } catch (e) {}
+    }
+    // 初始化示例数据
+    toilets = SAMPLE_TOILETS.map(function (t) {
+      return { id: genId(), name: t.name, lng: t.lng, lat: t.lat, shi: 0, shui: 0 };
+    });
+    saveToilets();
+  }
+
+  function saveToilets() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toilets));
+  }
+
+  function getToilet(id) {
+    for (var i = 0; i < toilets.length; i++) {
+      if (toilets[i].id === id) return toilets[i];
+    }
+    return null;
+  }
+
+  /* ============ 地图初始化 ============ */
+  function initMap() {
+    if (typeof AMap === 'undefined') {
+      document.getElementById('map').innerHTML =
+        '<div style="padding:30px;color:#999;text-align:center;">' +
+        '高德地图加载失败，请检查是否已替换有效的 Key（搜索 YOUR_AMAP_KEY）。</div>';
+      return;
+    }
+    map = new AMap.Map('map', {
+      zoom: 12,
+      center: GUANGZHOU_CENTER,
+      viewMode: '2D'
+    });
+
+    // 仅保留缩放控件
+    AMap.plugin('AMap.ToolBar', function () {
+      map.addControl(new AMap.ToolBar({
+        locate: false,
+        ruler: false,
+        direction: false,
+        position: { right: '10px', top: '10px' }
+      }));
+    });
+
+    // 创建悬停提示 InfoWindow（自定义模式：完全由 content 接管样式）
+    hoverInfo = new AMap.InfoWindow({
+      isCustom: true,
+      offset: new AMap.Pixel(0, -50), // 上移使卡片位于标记上方，箭头指向标记
+      closeWhenClickMap: false
+    });
+
+    renderMarkers();
+
+    // 点击地图空白：新建公厕
+    map.on('click', function (e) {
+      var name = prompt('请输入公厕名称：');
+      if (name && name.trim()) {
+        toilets.push({
+          id: genId(),
+          name: name.trim(),
+          lng: e.lnglat.getLng(),
+          lat: e.lnglat.getLat(),
+          shi: 0,
+          shui: 0
+        });
+        saveToilets();
+        renderMarkers();
+        renderRankings();
+        refreshStats();
+      }
+    });
+  }
+
+  function renderMarkers() {
+    if (!map) return;
+    // 清除旧标记
+    markers.forEach(function (m) { map.remove(m); });
+    markers = [];
+
+    toilets.forEach(function (t) {
+      // 蓝色倒三角形标记 + 自定义悬停提示框
+      var marker = new AMap.Marker({
+        position: [t.lng, t.lat],
+        content: '<div class="toilet-marker"></div>',
+        offset: new AMap.Pixel(-9, -16),
+        map: map
+      });
+      marker.on('click', function () {
+        openModal(t.id);
+      });
+      // 鼠标悬停：显示自定义白色简约提示框
+      marker.on('mouseover', function () {
+        if (!hoverInfo) return;
+        var html = '<div class="tip-card">' + escapeHtml(t.name) +
+                   '<div class="tip-arrow"></div></div>';
+        hoverInfo.setContent(html);
+        hoverInfo.open(map, marker.getPosition());
+      });
+      // 鼠标移出：关闭提示框
+      marker.on('mouseout', function () {
+        if (hoverInfo) hoverInfo.close();
+      });
+      markers.push(marker);
+    });
+  }
+
+  /* ============ 详情评分模态框 ============ */
+  function openModal(id) {
+    currentToiletId = id;
+    var t = getToilet(id);
+    if (!t) return;
+    document.getElementById('modalTitle').textContent = t.name + ' · 详情评分';
+    document.getElementById('ctrlName').textContent = t.name;
+    renderGrid();
+    updateScoreDisplay();
+    document.getElementById('modalMask').classList.add('show');
+    // ===== 评论区：初始化昵称 + 加载评论 =====
+    ensureNickname();
+    resetCommentForm();
+    loadComments();
+  }
+
+  function closeModal() {
+    document.getElementById('modalMask').classList.remove('show');
+    currentToiletId = null;
+    renderRankings(); // 关闭时刷新榜单
+    refreshStats();   // 关闭时刷新统计
+    resetCommentForm(); // 清理评论输入与图片预览
+  }
+
+  function updateScoreDisplay() {
+    var t = getToilet(currentToiletId);
+    if (!t) return;
+    document.getElementById('ctrlShit').textContent = t.shi;
+    document.getElementById('ctrlWater').textContent = t.shui;
+    document.getElementById('ctrlTotal').textContent = t.shi + t.shui;
+  }
+
+  // 渲染 24 格图标池：屎在前，水在后；空状态显示占位文字
+  function renderGrid() {
+    var t = getToilet(currentToiletId);
+    if (!t) return;
+    var grid = document.getElementById('iconGrid');
+    var placeholder = document.getElementById('gridPlaceholder');
+    var total = t.shi + t.shui;
+
+    grid.innerHTML = '';
+    if (total === 0) {
+      placeholder.style.display = 'flex'; // 显示“暂无评价”
+      return;
+    }
+    placeholder.style.display = 'none'; // 有图标则隐藏占位文字
+
+    var shitLeft = t.shi;
+    var waterLeft = t.shui;
+    for (var i = 0; i < CAP; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'icon-cell';
+      if (shitLeft > 0) {
+        cell.textContent = '💩';
+        shitLeft--;
+      } else if (waterLeft > 0) {
+        cell.textContent = '💧';
+        waterLeft--;
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  // 提升粪便率（先填充，后替换）
+  function addShit() {
+    // ====== 限制1：每日投票次数上限 10 次 ======
+    if (!checkDailyVoteAvailable()) {
+      alert('今天已经投了10次啦，不能再拉了哦～明天再来吧！💩');
+      return;
+    }
+    var t = getToilet(currentToiletId);
+    if (!t) return;
+    var total = t.shi + t.shui;
+    var changed = false;
+    if (total < CAP) {
+      t.shi++;
+      changed = true;
+    } else if (total === CAP && t.shui > 0) {
+      t.shui--;
+      t.shi++;
+      changed = true;
+    }
+    if (!changed) return; // 满且全是屎，不计数也不扣票
+    consumeDailyVote();
+    saveToilets();
+    renderGrid();
+    updateScoreDisplay();
+  }
+
+  // 提升干净率（先填充，后替换）
+  function addWater() {
+    // ====== 限制1：每日投票次数上限 10 次 ======
+    if (!checkDailyVoteAvailable()) {
+      alert('今天已经投了10次啦，清水也省着点用～明天再来吧！💧');
+      return;
+    }
+    var t = getToilet(currentToiletId);
+    if (!t) return;
+    var total = t.shi + t.shui;
+    var changed = false;
+    if (total < CAP) {
+      t.shui++;
+      changed = true;
+    } else if (total === CAP && t.shi > 0) {
+      t.shi--;
+      t.shui++;
+      changed = true;
+    }
+    if (!changed) return; // 满且全是水，不计数也不扣票
+    consumeDailyVote();
+    saveToilets();
+    renderGrid();
+    updateScoreDisplay();
+  }
+
+  /* ============ 右侧双榜单（互斥规则） ============ */
+  // “一塌糊涂”：粪便率 >= 50%，按粪便率降序取前 5
+  // “一尘不染”：粪便率 < 50%（即干净率 > 50%），按干净率降序取前 5
+  // 每个厕所仅出现在其中一个榜单
+  function renderRankings() {
+    var rated = toilets.filter(function (t) { return (t.shi + t.shui) > 0; });
+
+    var shitList = rated.filter(function (t) {
+      return (t.shi / (t.shi + t.shui)) >= 0.5;
+    }).sort(function (a, b) {
+      var ra = a.shi / (a.shi + a.shui);
+      var rb = b.shi / (b.shi + b.shui);
+      return rb - ra;
+    }).slice(0, 5);
+
+    var waterList = rated.filter(function (t) {
+      return (t.shi / (t.shi + t.shui)) < 0.5;
+    }).sort(function (a, b) {
+      var ra = a.shui / (a.shi + a.shui);
+      var rb = b.shui / (b.shi + b.shui);
+      return rb - ra;
+    }).slice(0, 5);
+
+    renderRankList('rankShit', shitList, 'shi');
+    renderRankList('rankWater', waterList, 'shui');
+  }
+
+  function renderRankList(elId, list, type) {
+    var el = document.getElementById(elId);
+    if (list.length === 0) {
+      el.innerHTML = '<div class="empty-state">暂无数据</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+      var t = list[i];
+      var total = t.shi + t.shui;
+      var rate = type === 'shi' ? t.shi / total : t.shui / total;
+      var pct = Math.round(rate * 100);
+      html += '<div class="rank-item">' + (i + 1) + '. ' + escapeHtml(t.name) + '（' + pct + '%）</div>';
+    }
+    el.innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  /* ============ 功能1：搜索定位厕所 ============ */
+  var searchInfo = null; // 搜索结果提示用的 InfoWindow
+  function searchToilet() {
+    var kw = document.getElementById('searchInput').value.trim();
+    if (!kw) { alert('请输入搜索关键词'); return; }
+    if (!map) return;
+    // 模糊匹配名称
+    var matched = toilets.filter(function (t) {
+      return t.name.indexOf(kw) !== -1;
+    });
+    if (matched.length === 0) {
+      alert('未找到匹配的厕所');
+      return;
+    }
+    // 定位到第一个匹配项
+    var first = matched[0];
+    map.setCenter([first.lng, first.lat]);
+    map.setZoom(16);
+    // 弹出自定义提示框“已找到：XX”
+    if (!searchInfo) {
+      searchInfo = new AMap.InfoWindow({
+        isCustom: true,
+        offset: new AMap.Pixel(0, -50),
+        closeWhenClickMap: true
+      });
+    }
+    var tip = '已找到：' + escapeHtml(first.name);
+    if (matched.length > 1) tip += '（共 ' + matched.length + ' 个匹配结果）';
+    searchInfo.setContent('<div class="tip-card">' + tip + '<div class="tip-arrow"></div></div>');
+    searchInfo.open(map, new AMap.LngLat(first.lng, first.lat));
+    console.log('找到 ' + matched.length + ' 个匹配结果');
+  }
+
+  /* ============ 功能2：今日数据统计 ============ */
+  // 总公厕数 / 已评分数 / 最高粪便率（取“一塌糊涂”榜单第一名，即粪便率 ≥ 50% 中最高）
+  function refreshStats() {
+    var total = toilets.length;
+    var rated = 0;
+    for (var i = 0; i < toilets.length; i++) {
+      if ((toilets[i].shi + toilets[i].shui) > 0) rated++;
+    }
+    // 最高粪便率：从一塌糊涂榜单（粪便率 ≥ 50%）取第一名
+    var topShit = '--';
+    var shitList = toilets.filter(function (t) {
+      return (t.shi + t.shui) > 0 && (t.shi / (t.shi + t.shui)) >= 0.5;
+    }).sort(function (a, b) {
+      return (b.shi / (b.shi + b.shui)) - (a.shi / (a.shi + a.shui));
+    });
+    if (shitList.length > 0) {
+      var top = shitList[0];
+      topShit = Math.round((top.shi / (top.shi + top.shui)) * 100) + '%';
+    }
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statRated').textContent = rated;
+    document.getElementById('statTopShit').textContent = topShit;
+  }
+
+  /* ============ 功能3：趣味标语轮播 ============ */
+  var SLOGANS = [
+    '人生就像拉屎，有时很顺畅，有时很努力却只是一个屁。',
+    '每一次蹲下，都是一次对人生的重新审视。',
+    '拉屎是唯一可以光明正大玩手机的时间。',
+    '干净是态度，拉屎是艺术。',
+    '不在沉默中爆发，就在马桶上解脱。',
+    '屎可忍，尿不可忍。',
+    '人生苦短，先拉为敬。',
+    '一蹲解千愁，再蹲万事休。',
+    '拉屎前我是世界的，拉屎后世界是我的。',
+    '每一坨屎，都值得被认真对待。',
+    '内急面前，人人平等。',
+    '找厕所的速度，决定了幸福的温度。',
+    '出门不带纸，厕所找知己。',
+    '急时抱佛脚，不如急时找厕所。',
+    '跑步进入厕所，是一种生活态度。',
+    '人生最大的谎言：我还能憋十分钟。',
+    '内急时，所有距离都是长征。',
+    '找到厕所的那一刻，世界都安静了。',
+    '憋尿是对膀胱的背叛。',
+    '每一秒都在与地心引力赛跑。',
+    '我不是在拉屎，我是在思考人生。',
+    '今天拉得顺，明天万事兴。',
+    '拉屎不积极，思想有问题。',
+    '我的梦想：实现拉屎自由。',
+    '厕所是我第二个家。',
+    '一天不拉屎，浑身不舒服；一天拉太多，马桶受不了。',
+    '我拉的不是屎，是寂寞。',
+    '马桶是唯一的听众。',
+    '每次冲水，都是一次告别。',
+    '蹲坑时，我比哲学家更深刻。',
+    '屎壳郎觉得我浪费，但我觉得它不懂生活。',
+    '小鸟拉屎都有人羡慕，因为它自由。',
+    '猫拉屎盖沙子，人拉屎冲水，这就是进化的差距。',
+    '狗拉屎要遛，人拉屎要命。',
+    '屎壳郎：你管这叫浪费？我管这叫美食。',
+    '大象拉屎是地震，我拉屎是日常。',
+    '蚊子在厕所里开派对，我才是主角。',
+    '鱼儿说：水里拉屎看不到，我羡慕。',
+    '开会时最想拉屎，这是身体在抗议。',
+    '领导讲重点时，我重点想上厕所。',
+    '学生时代，厕所是避难所。',
+    '上班摸鱼，不如厕所养鱼。',
+    '厕所里的五分钟，是社畜的复活时间。',
+    '加班不如加屎。',
+    '老板画的饼，不如厕所的坑实在。',
+    '考试前拉一泡，智商涨十分。',
+    '课间十分钟，厕所跑断腿。',
+    '职场秘笈：遇到难题，先蹲坑。',
+    '屎命必达。',
+    '拉屎不慌，必有回响。',
+    '一泻千里，痛快淋漓。',
+    '屎上最拉风（史上最拉风）。',
+    '能屈能伸，方能屎终如一（始终如一）。',
+    '屎出有名（师出有名）。',
+    '大屎馆欢迎您（大使馆）。',
+    '心中有屎，处处是坑（心中有数）。',
+    '屎不可挡（势不可挡）。',
+    '拉屎要趁热，吃饭要趁凉。',
+    '别急，厕所就在前方。',
+    '拉完这泡，生活还是美好的。',
+    '再难的事，拉完就过去了。',
+    '马桶是情绪的垃圾桶。',
+    '拉屎时，全世界都为你让路。',
+    '冲走烦恼，留下轻松。',
+    '厕所是心灵的按摩房。',
+    '拉屎是对自己最好的奖励。',
+    '雨天拉屎，听雨声，特有诗意。',
+    '夏天拉屎，汗如雨下，减肥效果。',
+    '冬天拉屎，马桶圈是最大的敌人。',
+    '雾霾天拉屎，看不清未来，看得清坑位。',
+    '台风天，抱紧马桶不放手。',
+    '雪天拉屎，窗外大雪纷飞，坑内热气蒸腾。',
+    '智能马桶，拉得更有科技感。',
+    '未来拉屎，可以评分，可以分享。',
+    '拉屎也要大数据分析，今天我们帮你统计。',
+    '无纸化办公，从无纸化擦屁股开始。',
+    '5G时代，拉屎下载更快。',
+    'AI 提醒你：该上厕所了。',
+    '虚拟现实拉屎，实体马桶体验。',
+    '区块链拉屎，每一次冲水都不可篡改。'
+  ];
+  var currentSloganIndices = [-1, -1, -1];
+  // 从标语库随机抽取 3 条互不重复的索引
+  function pickThreeSlogans() {
+    var pool = [];
+    for (var i = 0; i < SLOGANS.length; i++) pool.push(i);
+    // Fisher-Yates 洗牌后取前 3
+    for (var j = pool.length - 1; j > 0; j--) {
+      var k = Math.floor(Math.random() * (j + 1));
+      var tmp = pool[j]; pool[j] = pool[k]; pool[k] = tmp;
+    }
+    return pool.slice(0, 3);
+  }
+  function initSlogan() {
+    currentSloganIndices = pickThreeSlogans();
+    renderSlogans();
+  }
+  function rotateSlogan() {
+    currentSloganIndices = pickThreeSlogans();
+    renderSlogans();
+  }
+  function renderSlogans() {
+    for (var i = 0; i < 3; i++) {
+      var el = document.getElementById('sloganText' + i);
+      if (el) el.textContent = SLOGANS[currentSloganIndices[i]];
+    }
+  }
+
+  /* ============ 详情页评论区 ============ */
+  // 昵称存储键 user_nickname；评论存储键 comments_{厕所唯一ID}
+  // 厕所唯一ID = 名称 + 经纬度（确保唯一）
+  var NICKNAME_KEY = 'user_nickname';
+  var pendingImages = []; // 待发布图片的 base64 数组（最多3张）
+  var MAX_IMAGES = 3;
+  var MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+
+  // 生成厕所唯一ID
+  function getToiletCommentKey(id) {
+    var t = getToilet(id);
+    if (!t) return 'comments_unknown';
+    return 'comments_' + t.name + '_' + t.lng + '_' + t.lat;
+  }
+
+  // 读取某厕所的所有评论
+  function readComments(id) {
+    var raw = localStorage.getItem(getToiletCommentKey(id));
+    if (raw) {
+      try { var arr = JSON.parse(raw); if (Array.isArray(arr)) return arr; } catch (e) {}
+    }
+    return [];
+  }
+  // 写入评论
+  function writeComments(id, list) {
+    localStorage.setItem(getToiletCommentKey(id), JSON.stringify(list));
+  }
+
+  // 昵称机制：首次进入详情页且无昵称，弹窗设置（只弹一次）
+  function ensureNickname() {
+    var nick = localStorage.getItem(NICKNAME_KEY);
+    if (!nick) {
+      var input = prompt('请先设置你的昵称（后续评论将自动使用）：');
+      if (input && input.trim()) {
+        localStorage.setItem(NICKNAME_KEY, input.trim());
+      } else {
+        // 用户取消则给个默认昵称，避免反复弹窗
+        localStorage.setItem(NICKNAME_KEY, '匿名屎友');
+      }
+    }
+  }
+
+  // 格式化时间 YYYY-MM-DD HH:mm
+  function formatTime(d) {
+    var p = function (n) { return n < 10 ? '0' + n : '' + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+           ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  // 渲染评论列表（按时间从新到旧）
+  function loadComments() {
+    var list = readComments(currentToiletId);
+    // 时间倒序
+    list.sort(function (a, b) { return b.time < a.time ? -1 : (b.time > a.time ? 1 : 0); });
+    var el = document.getElementById('commentsList');
+    var countEl = document.getElementById('commentCount');
+    countEl.textContent = list.length > 0 ? '（' + list.length + '条）' : '';
+    if (list.length === 0) {
+      el.innerHTML = '<div class="comments-empty">暂无评价，快来抢沙发～</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      html += '<div class="comment-item">';
+      html += '<div class="comment-meta"><span class="comment-nick">' + escapeHtml(c.nickname) +
+              '</span><span class="comment-time">' + escapeHtml(c.time) + '</span></div>';
+      if (c.text) html += '<div class="comment-text">' + escapeHtml(c.text) + '</div>';
+      if (c.images && c.images.length > 0) {
+        html += '<div class="comment-images">';
+        for (var j = 0; j < c.images.length; j++) {
+          html += '<img class="comment-thumb" src="' + c.images[j] + '" onclick="viewImage(this.src)" />';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  }
+
+  // 点击缩略图：新窗口打开大图
+  function viewImage(src) {
+    var w = window.open('', '_blank');
+    if (w) {
+      w.document.write('<title>图片查看</title><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#222">' +
+                       '<img src="' + src + '" style="max-width:100%;max-height:100vh" /></body>');
+      w.document.close();
+    }
+  }
+
+  // 重置评论输入区与图片预览
+  function resetCommentForm() {
+    document.getElementById('commentText').value = '';
+    pendingImages = [];
+    renderPreviewRow();
+  }
+
+  // 渲染待上传图片预览（带删除按钮）
+  function renderPreviewRow() {
+    var row = document.getElementById('commentPreviewRow');
+    row.innerHTML = '';
+    for (var i = 0; i < pendingImages.length; i++) {
+      (function (idx) {
+        var wrap = document.createElement('div');
+        wrap.className = 'preview-wrap';
+        var img = document.createElement('img');
+        img.className = 'preview-img';
+        img.src = pendingImages[idx];
+        var del = document.createElement('div');
+        del.className = 'preview-del';
+        del.textContent = '×';
+        del.onclick = function () {
+          pendingImages.splice(idx, 1);
+          renderPreviewRow();
+        };
+        wrap.appendChild(img);
+        wrap.appendChild(del);
+        row.appendChild(wrap);
+      })(i);
+    }
+  }
+
+  // 触发文件选择
+  function pickImages() {
+    document.getElementById('commentFile').value = '';
+    document.getElementById('commentFile').click();
+  }
+
+  // 处理文件选择：限制最多3张、每张≤2MB、格式 jpg/png/gif
+  function onFilesSelected(input) {
+    var files = input.files;
+    if (!files || files.length === 0) return;
+    var remaining = MAX_IMAGES - pendingImages.length;
+    if (remaining <= 0) { alert('最多只能上传3张图片哦～'); return; }
+    var added = 0;
+    var toRead = [];
+    for (var i = 0; i < files.length && added < remaining; i++) {
+      var f = files[i];
+      // 格式校验
+      if (!/image\/(jpeg|png|gif)/.test(f.type)) {
+        alert('只支持 jpg/png/gif 格式：' + f.name);
+        continue;
+      }
+      // 大小校验
+      if (f.size > MAX_IMAGE_SIZE) {
+        alert('图片超过2MB：' + f.name);
+        continue;
+      }
+      toRead.push(f);
+      added++;
+    }
+    if (files.length > remaining) {
+      alert('一次最多3张，已选 ' + added + ' 张');
+    }
+    // 逐个读取为 base64
+    var processed = 0;
+    toRead.forEach(function (f) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        pendingImages.push(e.target.result);
+        processed++;
+        if (processed === toRead.length) renderPreviewRow();
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  // 发布评论
+  function submitComment() {
+    var text = document.getElementById('commentText').value.trim();
+    var nick = localStorage.getItem(NICKNAME_KEY);
+    // 昵称校验
+    if (!nick) {
+      alert('请先设置你的昵称');
+      ensureNickname();
+      return;
+    }
+    // 至少输入文字或上传图片
+    if (!text && pendingImages.length === 0) {
+      alert('请至少输入文字或上传图片');
+      return;
+    }
+    var comment = {
+      nickname: nick,
+      time: formatTime(new Date()),
+      text: text,
+      images: pendingImages.slice()
+    };
+    var list = readComments(currentToiletId);
+    list.push(comment);
+    writeComments(currentToiletId, list);
+    // 立即刷新列表并重置输入
+    loadComments();
+    resetCommentForm();
+  }
+
+  /* ============ 限制1：每日投票次数（上限10次） ============ */
+  // 存储键 daily_votes：{ date: "YYYY-MM-DD", count: number }
+  var DAILY_VOTE_KEY = 'daily_votes';
+  var DAILY_VOTE_LIMIT = 10;
+  function getTodayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+  // 读取并返回当日投票计数（跨天自动重置）
+  function getDailyVotes() {
+    var raw = localStorage.getItem(DAILY_VOTE_KEY);
+    var data;
+    if (raw) {
+      try { data = JSON.parse(raw); } catch (e) { data = null; }
+    }
+    var today = getTodayStr();
+    if (!data || data.date !== today) {
+      data = { date: today, count: 0 };
+      localStorage.setItem(DAILY_VOTE_KEY, JSON.stringify(data));
+    }
+    return data;
+  }
+  // 检查今日是否还能投票
+  function checkDailyVoteAvailable() {
+    var data = getDailyVotes();
+    return data.count < DAILY_VOTE_LIMIT;
+  }
+  // 消耗一次投票次数
+  function consumeDailyVote() {
+    var data = getDailyVotes();
+    data.count++;
+    localStorage.setItem(DAILY_VOTE_KEY, JSON.stringify(data));
+  }
+
+  /* ============ 限制2：客观性评分（每人仅一次） ============ */
+  var SITE_RATED_KEY = 'site_rated';
+  // 更新底部按钮的禁用状态与感谢文字
+  function updateSiteRatedUI() {
+    var rated = localStorage.getItem(SITE_RATED_KEY) === 'true';
+    var yesBtn = document.getElementById('rateYesBtn');
+    var noBtn = document.getElementById('rateNoBtn');
+    var tip = document.getElementById('siteRatedTip');
+    if (rated) {
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      tip.style.display = '';
+    } else {
+      yesBtn.disabled = false;
+      noBtn.disabled = false;
+      tip.style.display = 'none';
+    }
+  }
+
+  /* ============ 底部全站客观性评分 ============ */
+  function rateSite(choice) {
+    // ====== 限制2：每人仅一次，已投则直接返回 ======
+    if (localStorage.getItem(SITE_RATED_KEY) === 'true') return;
+    var r = loadSiteRating();
+    r[choice]++;
+    localStorage.setItem(SITE_RATING_KEY, JSON.stringify(r));
+    // 记录已评分，永久禁用
+    localStorage.setItem(SITE_RATED_KEY, 'true');
+    updateSiteRate();
+    updateSiteRatedUI();
+  }
+
+  function loadSiteRating() {
+    var raw = localStorage.getItem(SITE_RATING_KEY);
+    if (raw) {
+      try {
+        var p = JSON.parse(raw);
+        if (p && typeof p.yes === 'number' && typeof p.no === 'number') return p;
+      } catch (e) {}
+    }
+    return { yes: 0, no: 0 };
+  }
+
+  function updateSiteRate() {
+    var r = loadSiteRating();
+    var y = r.yes + r.no;
+    var el = document.getElementById('siteRateDisplay');
+    if (y === 0) {
+      el.textContent = '暂无评分';
+    } else {
+      var x = Math.round((r.yes / y) * 100);
+      el.textContent = '百分之' + x + '的人认为事实如此，共' + y + '人参与评分';
+    }
+  }
+
+  /* ============ 启动 ============ */
+  window.onload = function () {
+    loadToilets();
+    initMap();
+    renderRankings();
+    updateSiteRate();
+    updateSiteRatedUI(); // 限制2：根据 site_rated 设置底部按钮可用状态
+    refreshStats();
+    initSlogan();
+    // 标语刷新按钮：点击重新随机三条
+    document.getElementById('sloganRefresh').addEventListener('click', rotateSlogan);
+    // 搜索框回车触发
+    document.getElementById('searchInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.keyCode === 13) searchToilet();
+    });
+  };
+</script>
+</body>
+</html>
